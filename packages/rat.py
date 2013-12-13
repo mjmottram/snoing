@@ -113,7 +113,7 @@ class RatDevelopment(Rat):
         super(RatDevelopment, self).__init__(name, system, "root-5.34.11", "geant4.9.6.p02", "scons-2.1.0")
     def _get_dependencies(self):
         """ Return the extra dependencies."""
-        return ["curl-7.26.0", "bzip2-1.0.6"]
+        return ["curl-7.26.0", "bzip2-1.0.6", "xerces-c-3.1.1"]
     def _is_downloaded(self):
         """ Check if tarball has been downloaded."""
         return os.path.exists(self.get_install_path())
@@ -125,6 +125,10 @@ class RatDevelopment(Rat):
         """ Write the environment file required for the current rat-dev."""
         self._env_file.add_source(self._dependency_paths[self._geant_dep], "bin/geant4")
         self._env_file.append_path(os.path.join(self._dependency_paths[self._geant_dep], "bin"))
+        if self._dependency_paths["xerces-c-3.1.1"] is not None: # Conditional Package
+            self._env_file.add_environment("XERCESCROOT", self._dependency_paths["xerces-c-3.1.1"])
+            self._env_file.append_library_path(os.path.join(self._dependency_paths["xerces-c-3.1.1"], 
+                                                          "lib"))
         if self._dependency_paths["curl-7.26.0"] is not None: # Conditional Package
             self._env_file.append_path(os.path.join(self._dependency_paths["curl-7.26.0"], "bin"))
             self._env_file.append_library_path(os.path.join(self._dependency_paths["curl-7.26.0"], "lib"))

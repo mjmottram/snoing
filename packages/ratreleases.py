@@ -23,12 +23,17 @@ class RatRelease4Post4(rat.RatRelease):
                                                tar_name)
         self._curl_dep = "curl-7.26.0"
         self._bzip_dep = "bzip2-1.0.6"
+        self._xercesc_dep = "xerces-c-3.1.1"
     def _get_dependencies(self):
         """ Return the extra dependencies."""
-        return [self._curl_dep, self._bzip_dep]
+        return [self._curl_dep, self._bzip_dep, self._xercesc_dep]
     def _write_env_file(self):
         """ Diff geant env file and no need to patch rat."""
         self._env_file.add_source(self._dependency_paths[self._geant_dep], "bin/geant4")
+        if self._dependency_paths[self._xercesc_dep] is not None: # Conditional Package
+            self._env_file.add_environment("XERCESCROOT", self._dependency_paths[self._xercesc_dep])
+            self._env_file.append_library_path(os.path.join(self._dependency_paths[self._xercesc_dep], 
+                                                          "lib"))
         self._env_file.append_path(os.path.join(self._dependency_paths[self._geant_dep], "bin"))
         if self._dependency_paths[self._curl_dep] is not None: # Conditional Package
             self._env_file.append_path(os.path.join(self._dependency_paths[self._curl_dep], "bin"))
