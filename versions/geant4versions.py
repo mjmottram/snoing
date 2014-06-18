@@ -9,12 +9,19 @@
 ####################################################################################################
 import geant4
 
+class Geant41000(geant4.Geant4Post5):
+    """ Geant4 4.10.00.p01, install package."""
+    def __init__(self, system):
+        """ Initiliase the geant4 4.10.00.p01 package."""
+        super(Geant41000, self).__init__("geant4.10.00.p01", system, "geant4.10.00.p01.tar.gz", 
+                                       [], "xerces-c-3.1.1")
+
 class Geant496(geant4.Geant4Post5):
     """ Geant4 4.9.6.p02, install package."""
     def __init__(self, system):
         """ Initiliase the geant4 4.9.6.p02 package."""
         super(Geant496, self).__init__("geant4.9.6.p02", system, "geant4.9.6.p02.tar.gz", 
-                                       "xerces-c-3.1.1")
+                                       ["G4NDL4.2.TS.tar.gz"], "xerces-c-3.1.1")
 
 class Geant495(geant4.Geant495):
     """ Geant4 4.9.5.p01, install package."""

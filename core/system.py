@@ -205,10 +205,10 @@ class System(object):
                 raise snoing_exceptions.SystemException("Download error", url)
         self._logger.detail("Downloaded %i bytes\n" % download_size)
         return download_size
-    def untar_file(self, file_name, target_path, strip=0):
+    def untar_file(self, file_name, target_path, strip=0, overwrite=True):
         """ Untar file_name to target_path striping the first strip folders."""
         self._logger.command("untar " + file_name)
-        if os.path.exists(target_path):
+        if os.path.exists(target_path) and overwrite is True:
             shutil.rmtree(target_path)
         if strip == 0: # Untar directly into target
             tar_file = tarfile.open(os.path.join(self.get_cache_path(), file_name))

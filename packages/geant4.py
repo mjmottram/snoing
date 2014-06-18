@@ -15,10 +15,11 @@ import shutil
 
 class Geant4Post5(localpackage.LocalPackage):
     """ Base geant4 installer for post 4.9.5 geant versions."""
-    def __init__(self, name, system, tar_name, xerces_dep):
+    def __init__(self, name, system, tar_name, data_tars, xerces_dep):
         """ Initialise the geant4 package."""
         super(Geant4Post5, self).__init__(name, system)
         self._tar_name = tar_name
+        self._data_tars = data_tars
         self._xerces_dep = xerces_dep
     def get_dependencies(self):
         """ Return the dependency names as a list of names."""
@@ -28,7 +29,10 @@ class Geant4Post5(localpackage.LocalPackage):
         return dependencies
     def _is_downloaded(self):
         """ Check if the tar file has been downloaded."""
-        return self._system.file_exists(self._tar_name)
+        downloaded = True
+        for tar in self._data_tars:
+            downloaded = downloaded and self._system.file_exists(tar)
+        return downloaded and self._system.file_exists(self._tar_name)
     def _is_installed(self):
         """ Check if the package has been installed."""
         installed = self._system.library_exists("libG4event", os.path.join(self.get_install_path(), "lib")) or \
@@ -42,6 +46,8 @@ class Geant4Post5(localpackage.LocalPackage):
         """ Derived classes should override this to download the package."""
         self._system.download_file(
             "http://geant4.web.cern.ch/geant4/support/source/" + self._tar_name)
+        for tar in self._data_tars:
+            self._system.download_file("http://geant4.web.cern.ch/geant4/support/source/" + tar)
     def _install(self):
         """ Install geant4, using cmake."""
         source_path = os.path.join(self._system.get_install_path(), "%s-source" % self._name)
@@ -69,6 +75,8 @@ class Geant4Post5(localpackage.LocalPackage):
         self._system.configure_command(cmake_command, cmake_opts, self.get_install_path(), env, config_type="geant4")
         self._system.execute_command("make", [], self.get_install_path(), env)
         self._system.execute_command("make", ['install'], self.get_install_path(), env)
+        for tar in self._data_tars:
+            self._system.untar_file(tar, os.path.join(self.get_install_path(), "share/Geant4-9.6.2/data"), 0, False)
         
 
 class Geant495(localpackage.LocalPackage):
