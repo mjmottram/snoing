@@ -9,7 +9,9 @@
 # Author P G Jones - 22/09/2012 <p.g.jones@qmul.ac.uk> : Major refactor of snoing.
 ####################################################################################################
 import conditionallibrarypackage
+import installmode
 import os
+import shutil
 
 class Curl(conditionallibrarypackage.ConditionalLibraryPackage):
     """ Base curl installer package. """
@@ -40,3 +42,5 @@ class Curl(conditionallibrarypackage.ConditionalLibraryPackage):
                                        cwd=source_path, config_type="curl")
         self._system.execute_command("make", cwd=source_path)
         self._system.execute_command("make", ["install"], cwd=source_path)
+        if self._system.get_install_mode() == installmode.Grid:
+            shutil.rmtree(source_path)

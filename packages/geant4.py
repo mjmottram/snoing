@@ -69,7 +69,8 @@ class Geant4Post5(localpackage.LocalPackage):
         self._system.configure_command(cmake_command, cmake_opts, self.get_install_path(), env, config_type="geant4")
         self._system.execute_command("make", [], self.get_install_path(), env)
         self._system.execute_command("make", ['install'], self.get_install_path(), env)
-        
+        if self._system.get_install_mode() == installmode.Grid:
+            shutil.rmtree(source_path)
 
 class Geant495(localpackage.LocalPackage):
     """ Base geant4 installer for post 4.9.4 geant versions. This is sooooo much nicer"""
@@ -128,6 +129,8 @@ class Geant495(localpackage.LocalPackage):
         self._system.configure_command(cmake_command, cmake_opts, self.get_install_path(), env, config_type="geant4")
         self._system.execute_command("make", [], self.get_install_path(), env)
         self._system.execute_command("make", ['install'], self.get_install_path(), env)
+        if self._system.get_install_mode() == installmode.Grid:
+            shutil.rmtree(source_path)
     def _patch_timeout(self):
         """ Patch the cmake scripts to increase the timeout limit, geant4.9.5.p01 fix."""
         file_path = os.path.join(self._system.get_install_path(), 
