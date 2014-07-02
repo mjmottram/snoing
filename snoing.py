@@ -34,17 +34,24 @@ if __name__ == "__main__":
         defaults = pickle.load(default_file)
         default_file.close()
         try:
-            a = defaults['cache_path']
+            a = defaults["rat_install_path"]
         except KeyError, e:
-            defaults = {"cache_path" : defaults['cache'], "install_path" : defaults['install']}
+            try:
+                a = defaults['cache_path']
+                defaults = {"cache_path" : defaults['cache_path'], "rat_install_path" : defaults['install_path'],
+                            "dependency_install_path" : defaults["install_path"]}
+            except KeyError, e:
+                defaults = {"cache_path" : defaults['cache'], "rat_install_path" : defaults['install'],
+                            "dependency_install_path" : defaults["install"]}
     else: # No defaults to load, thus create
-        defaults = {"cache_path" : "cache", "install_path" : "install"}
+        defaults = {"cache_path" : "cache", "rat_install_path" : "install",
+                    "dependency_install_path" : "install"}
     # First build the options and parse the calling command
     parser = optparse.OptionParser(usage = "usage: %prog [options] [package]", version="%prog 2.0")
     parser.add_option("-c", type="string", dest="cache_path", help="Cache path.", 
                       default=defaults["cache_path"])
-    parser.add_option("-i", type="string", dest="install_path", help="Install path.", 
-                      default=defaults["install_path"])
+    parser.add_option("-i", type="string", dest="rat_install_path", help="Install path.", 
+                      default=defaults["rat_install_path"])
     parser.add_option("-v", action="store_true", dest="verbose", help="Verbose Install?", 
                       default=False)
     parser.add_option("-a", action="store_true", dest="all", help="All packages?")
@@ -70,6 +77,8 @@ if __name__ == "__main__":
     actionGroup.add_option("-R", action="store_true", dest="force_remove", help=optparse.SUPPRESS_HELP, 
                            default=False)
     actionGroup.add_option("-d", action="store_true", dest="dependency", help="Install dependencies only?")
+    actionGroup.add_option("-D", dest="dependency_install_path", help="Install dependencies to alternative location?",
+                           default=defaults["dependency_install_path"])
     actionGroup.add_option("-p", action="store_true", dest="progress", help="Progress/update the package?")
     parser.add_option_group(actionGroup)
 
@@ -81,7 +90,13 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
     # Dump the new defaults
     defaults["cache_path"] = options.cache_path
-    defaults["install_path"] = options.install_path
+    defaults["rat_install_path"] = options.rat_install_path
+    defaults["dependency_install_path"] = options.rat_install_path
+    dependency_install_path = options.rat_install_path
+    if options.dependency_install_path:
+        # Install dependencies to an alternative location
+        defaults['dependency_install_path'] = options.dependency_install_path
+        dependency_install_path = options.dependency_install_path
     default_file = open(default_file_path, "w")
     pickle.dump(defaults, default_file)
     default_file.close()
@@ -107,7 +122,7 @@ if __name__ == "__main__":
     if options.curl_arguments is not None:
         opt_args["curl"] = options.curl_arguments.split()
     try:
-        install_system = system.System(logger, options.cache_path, options.install_path, install_mode, opt_args)
+        install_system = system.System(logger, options.cache_path, options.rat_install_path, dependency_install_path, install_mode, opt_args)
     except snoing_exceptions.InstallModeException, e:
         print e.args[0], "The existing installation is ", installmode.Text[e.SystemMode], ". You've requested the installation to be ", installmode.Text[e.CommandMode]
         print "You can install to a new path using the -i option or delete the existing installation and start again."
@@ -128,6 +143,10 @@ if __name__ == "__main__":
                 pass
             elif options.remove: # Wish to remove all packages
                 shutil.rmtree(install_system.get_install_path())
+                try:
+                    shutil.rmtree(install_system.get_rat_install_path())
+                except OSError:
+                    pass # Path not there
             elif options.dependency: # Doesn't make sense
                 Log.warn("Input options don't make sense.")
                 PrintErrorMessage()

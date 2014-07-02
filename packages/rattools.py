@@ -6,13 +6,13 @@
 #
 # Author P G Jones - 15/10/2012 <p.g.jones@qmul.ac.uk> : First revision
 ####################################################################################################
-import localpackage
+import snopluspackage
 import os
 import system
 import getpass
 import envfilebuilder
 
-class RatTools(localpackage.LocalPackage):
+class RatTools(snopluspackage.SnoplusPackage):
     """ Base class for rat-tools."""
     def __init__(self, name, system, root_dep, rat_dep):
         """ Initialise rat-tools."""
@@ -43,11 +43,11 @@ class RatTools(localpackage.LocalPackage):
         env.add_environment("ROOTSYS", self._dependency_paths[self._root_dep])
         env.append_library_path("$ROOTSYS/lib:%s" % os.path.join(self.get_install_path(), "ratzdab/lib"))
         env.append_path("$ROOTSYS/bin:%s" % os.path.join(self.get_install_path(), "ratzdab/bin"))
-        env.write(self._system.get_install_path(), "env_%s" % self._name)
+        env.write(self._system.get_rat_install_path(), "env_%s" % self._name)
     def _remove(self):
         """ Delete the env files as well."""
-        self._system.remove(os.path.join(self._system.get_install_path(), "env_%s.sh" % self._name))
-        self._system.remove(os.path.join(self._system.get_install_path(), "env_%s.csh" % self._name))
+        self._system.remove(os.path.join(self._system.get_rat_install_path(), "env_%s.sh" % self._name))
+        self._system.remove(os.path.join(self._system.get_rat_install_path(), "env_%s.csh" % self._name))
 
 class RatToolsDevelopment(RatTools):
     '''RatTools development class'''

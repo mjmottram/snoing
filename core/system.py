@@ -25,7 +25,7 @@ class System(object):
     executed.
     """
     Mac, Linux = range(2)
-    def __init__(self, logger, cache_path, install_path, install_mode=None, arguments={}):
+    def __init__(self, logger, cache_path, rat_install_path, dependency_install_path, install_mode=None, arguments={}):
         """ Initialise with a logger for output and a prefered cache and install path. The 
         install_mode is optional, None is no install mode required. The arguments are extra 
         arguments applied to all configure script calls (package specific).
@@ -33,7 +33,8 @@ class System(object):
         self._logger = logger
         self._check_clean_environment()
         self._cache_path = self.build_path(cache_path)
-        self._install_path = self.build_path(install_path)
+        self._install_path = self.build_path(dependency_install_path)
+        self._rat_install_path = self.build_path(rat_install_path)
         self._arguments = arguments
         # Check the system type, only concerned about mac or linux
         if os.uname()[0] == "Darwin":
@@ -71,7 +72,7 @@ class System(object):
         if self.find_library("g++") is None:
             raise snoing_exceptions.SystemException("No g++", "g++ not found on this system.")
         # Check the install mode status of the install_path
-        settings_path = os.path.join(self._install_path, "snoing.pkl")
+        settings_path = os.path.join(self._rat_install_path, "snoing.pkl")
         self._install_mode = self._deserialise(settings_path)
         if isinstance(self._install_mode, dict):
             if self._install_mode['Graphical'] == 1:
@@ -88,7 +89,7 @@ class System(object):
             self._serialise(settings_path, install_mode)
         self._install_mode = install_mode
         # All good if we get here
-        self._logger.set_install_path(os.path.join(self.get_install_path(), "snoing.log"))
+        self._logger.set_install_path(os.path.join(self.get_rat_install_path(), "snoing.log"))
         self._logger.info("System ready.")
         self._logger.info("Caching to " + self._cache_path)
         self._logger.info("Installing to " + self._install_path)
@@ -101,6 +102,9 @@ class System(object):
     def get_install_path(self):
         """ Return the install path."""
         return self._install_path
+    def get_rat_install_path(self):
+        """ Return the rat install path."""
+        return self._rat_install_path
     def get_install_mode(self):
         """ Return the system install mode."""
         return self._install_mode

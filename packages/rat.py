@@ -10,12 +10,12 @@
 #                                                        refactored versions
 #        P G Jones - 23/09/2012 <p.g.jones@qmul.ac.uk> : Major refactor of snoing.
 ####################################################################################################
-import localpackage
+import snopluspackage
 import os
 import getpass
 import envfilebuilder
 
-class Rat(localpackage.LocalPackage):
+class Rat(snopluspackage.SnoplusPackage):
     """ Base rat installer for rat."""
     def __init__(self, name, system, root_dep, geant_dep, scons_dep):
         """ All Rat installs have the same root and scons dependence."""
@@ -46,13 +46,13 @@ class Rat(localpackage.LocalPackage):
         self.write_env_file()
         # Write the command file and source it...
         command_text = """#!/bin/bash\nsource %s\ncd %s\n./configure\nsource env.sh\nscons""" % \
-            (os.path.join(self._system.get_install_path(), "env_%s.sh" % self._name), 
+            (os.path.join(self._system.get_rat_install_path(), "env_%s.sh" % self._name), 
              self.get_install_path())
         self._system.execute_complex_command(command_text)
     def _remove(self):
         """ Delete the env files as well."""
-        self._system.remove(os.path.join(self._system.get_install_path(), "env_%s.sh" % self._name))
-        self._system.remove(os.path.join(self._system.get_install_path(), "env_%s.csh" % self._name))
+        self._system.remove(os.path.join(self._system.get_rat_install_path(), "env_%s.sh" % self._name))
+        self._system.remove(os.path.join(self._system.get_rat_install_path(), "env_%s.csh" % self._name))
     def write_env_file(self):
         """ Adds general parts and then writes the env file."""
         self._env_file = envfilebuilder.EnvFileBuilder("#rat environment\n")
@@ -65,7 +65,7 @@ class Rat(localpackage.LocalPackage):
                                                         "lib"))
         self._env_file.add_post_source(self.get_install_path(), "env")
         self._write_env_file()
-        self._env_file.write(self._system.get_install_path(), "env_%s" % self._name)
+        self._env_file.write(self._system.get_rat_install_path(), "env_%s" % self._name)
     # Functions that must be implemented by sub classes
     def _write_env_file(self):
         """ Sub classes should add parts to the env file."""
@@ -134,13 +134,13 @@ class RatDevelopment(Rat):
     def _update(self):
         """ Special updater for rat-dev, delete env file write a new then git pull and scons."""
         command_text = "#!/bin/bash\nsource %s\ncd %s\nscons -c" \
-            % (os.path.join(self._system.get_install_path(), "env_%s.sh" % self._name), self.get_install_path())
-        self._system.remove(os.path.join(self._system.get_install_path(), "env_%s.sh" % self._name))
-        self._system.remove(os.path.join(self._system.get_install_path(), "env_%s.csh" % self._name))
+            % (os.path.join(self._system.get_rat_install_path(), "env_%s.sh" % self._name), self.get_install_path())
+        self._system.remove(os.path.join(self._system.get_rat_install_path(), "env_%s.sh" % self._name))
+        self._system.remove(os.path.join(self._system.get_rat_install_path(), "env_%s.csh" % self._name))
         super(RatDevelopment, self).write_env_file()
         command_text = "#!/bin/bash\nsource %s\ncd %s\ngit pull\n./configure\n" \
-            % (os.path.join(self._system.get_install_path(), "env_%s.sh" % self._name), self.get_install_path())
+            % (os.path.join(self._system.get_rat_install_path(), "env_%s.sh" % self._name), self.get_install_path())
         self._system.execute_complex_command(command_text, verbose=True)
         command_text = "#!/bin/bash\nsource %s\ncd %s\nscons\n" \
-            % (os.path.join(self._system.get_install_path(), "env_%s.sh" % self._name), self.get_install_path())
+            % (os.path.join(self._system.get_rat_install_path(), "env_%s.sh" % self._name), self.get_install_path())
         self._system.execute_complex_command(command_text, verbose=True)
