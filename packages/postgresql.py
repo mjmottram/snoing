@@ -10,6 +10,7 @@ import conditionallibrarypackage
 import os
 import stat
 import shutil
+from distutils.version import LooseVersion
 
 class PostgreSQL(conditionallibrarypackage.ConditionalLibraryPackage):
     """ Base PostgreSQL installer."""
@@ -31,6 +32,20 @@ class PostgreSQL(conditionallibrarypackage.ConditionalLibraryPackage):
     def _is_downloaded(self):
         """ Check the tarball has been downloaded"""
         return self._system.file_exists(self.get_tar_name())
+
+    def _is_system_installed( self ):
+        """ Override to ensure version is correct"""
+        installed = super(PostgreSQL, self)._is_system_installed()
+        if installed:
+            try:
+                output = self._system.execute_command('pg_config', ['--version'])
+            except:
+                installed = False
+            else:
+                version = output.split()[1]
+                if LooseVersion(version) < LooseVersion(self._version):
+                    installed = False
+        return installed
 
     def _is_installed(self):
         """ Check both binaries and libraries are installed"""
