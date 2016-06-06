@@ -12,11 +12,11 @@
 ####################################################################################################
 import root
 
-class ROOT60304(root.Root):
-    """ Root 6.03.04, install package."""
+class ROOT60602(root.Root):
+    """ Root 6.06.04, install package."""
     def __init__(self, system):
-        """ Initiliase the root 6.03.08 package."""
-        super(ROOT60304, self).__init__("root-6.03.04", system, "root_v6.03.04.source.tar.gz")
+        """ Initiliase the root 6.06.02 package."""
+        super(ROOT60602, self).__init__("root-6.06.02", system, "root_v6.06.02.source.tar.gz")
 
 class ROOT53434(root.Root):
     """ Root 5.34.34, install package."""

@@ -60,11 +60,11 @@ class Root(localpackage.LocalPackage):
                     '--disable-gfal',
                     '--with-xrootd=%s' % os.path.join(self._system.get_install_path(), 'xrootd-%s' % self._xrootd_version)]
         else:
-            args = ['--enable-minuit2', '--enable-roofit',  '--enable-python', '--enable-mathmore','--enable-gdml',
+            args = ['--enable-minuit2', '--enable-roofit',  '--enable-python', '--enable-mathmore',
+                    '--enable-gdml', '--enable-http',
                     '--with-fftw3-incdir=%s' % os.path.join(self._system.get_install_path(), 'fftw-%s' % self._fftw_version, 'include'),
                     '--with-fftw3-libdir=%s' % os.path.join(self._system.get_install_path(), 'fftw-%s' % self._fftw_version, 'lib'),
                     '--with-gsl-incdir=%s' % os.path.join(self._system.get_install_path(), 'gsl-%s' % self._gsl_version, 'include'),
                     '--with-gsl-libdir=%s' % os.path.join(self._system.get_install_path(), 'gsl-%s' % self._gsl_version, 'lib')]
         self._system.configure_command(args=args, cwd=self.get_install_path(),config_type='root')
-        exit
         self._system.execute_command('make', cwd=self.get_install_path())
